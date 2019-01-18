@@ -179,11 +179,11 @@ def task_onset_grabber(task_path):
                 print("No Data in EV file.")
     onset_data = pandas.concat(onset_data)
     onset_data = onset_data.sort_values(by=['onset'])
-
+    onset_data_copy = onset_data.copy()
     for index, row in onset_data.iterrows():
         if row['event'] is 'block':
-            onset_data.iloc[index:,5] = row['trial_type']
-    return onset_data
+            onset_data_copy.iloc[index:,5] = row['trial_type']
+    return onset_data_copy
 
 def hcp2bids(input_dir, output_dir, s_link = False):
     import os 
