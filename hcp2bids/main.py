@@ -153,6 +153,7 @@ def fs2bids(input_dir, output_dir, s_link = False):
 
 
 def task_onset_grabber(task_path):
+    print(task_path)
     task_data_evs = os.path.join(os.path.dirname(task_path), "LINKED_DATA", "EPRIME", "EVs")
     evList = glob.glob(os.path.join(task_data_evs,"*.txt"))
     onset_data = []
