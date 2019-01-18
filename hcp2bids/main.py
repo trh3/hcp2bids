@@ -166,7 +166,7 @@ def task_onset_grabber(task_path):
         if 'Sync' not in ev:
             print(ev)
             try:
-                onset_data_temp = pandas.read_csv(ev,sep="\t")
+                onset_data_temp = pandas.read_csv(ev,sep="\t",header=None)
                 onset_data_temp.columns = ['onset', 'duration','FSLIntensity']
                 onset_data_temp['trial_type'] = os.path.splitext(os.path.basename(ev))[0]
                 if os.path.basename(ev) in eventFiles:
