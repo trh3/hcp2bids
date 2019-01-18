@@ -153,7 +153,7 @@ def fs2bids(input_dir, output_dir, s_link = False):
 
 
 def task_onset_grabber(task_path):
-    task_data_evs = os.path.join(os.path.dirname(task_path), "LINKED_DATA", "EPRIME")
+    task_data_evs = os.path.join(os.path.dirname(task_path), "LINKED_DATA", "EPRIME", "EVs")
     evList = glob.glob(os.path.join(task_data_evs,"*.txt"))
     onset_data = []
 
@@ -178,6 +178,7 @@ def task_onset_grabber(task_path):
         if row['event'] is 'block':
             onset_data.iloc[index:,5] = row['trial_type']
     return onset_data
+
 def hcp2bids(input_dir, output_dir, s_link = False):
     import os 
 
