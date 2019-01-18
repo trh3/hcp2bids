@@ -165,15 +165,18 @@ def task_onset_grabber(task_path):
     for ev in evList:
         if 'Sync' not in ev:
             print(ev)
-            onset_data_temp = pandas.read_csv(ev,sep="\t")
-            onset_data_temp.columns = ['onset', 'duration','FSLIntensity']
-            onset_data_temp['trial_type'] = os.path.splitext(os.path.basename(ev))[0]
-            if os.path.basename(ev) in eventFiles:
-                onset_data_temp['event'] = 'event'
-            else:
-                onset_data_temp['event'] = 'block'
-            onset_data_temp['block_membership'] = "na"
-            onset_data.append(onset_data_temp)
+            try:
+                onset_data_temp = pandas.read_csv(ev,sep="\t")
+                onset_data_temp.columns = ['onset', 'duration','FSLIntensity']
+                onset_data_temp['trial_type'] = os.path.splitext(os.path.basename(ev))[0]
+                if os.path.basename(ev) in eventFiles:
+                    onset_data_temp['event'] = 'event'
+                else:
+                    onset_data_temp['event'] = 'block'
+                onset_data_temp['block_membership'] = "na"
+                onset_data.append(onset_data_temp)
+            except pandas.errors.EmptyDataError:
+                print("No Data in EV file.")
     onset_data = pandas.concat(onset_data)
     onset_data = onset_data.sort_values(by=['onset'])
 
