@@ -7,7 +7,7 @@ ture and renames all files as per BIDS standard.
 """
 
 import os, glob, shutil
-import re, json, numpy
+import re, json, pandas
 import nibabel as ni
 
 
@@ -152,6 +152,32 @@ def fs2bids(input_dir, output_dir, s_link = False):
                 shutil.move(subj_fs, fs_bids)
 
 
+def task_onset_grabber(task_path):
+    task_data_evs = os.path.join(os.path.dirname(), "LINKED_DATA", "EPRIME")
+    evList = glob.glob(os.path.join(task_data_evs,"*.txt"))
+    onset_data = []
+
+    eventFiles = ['0bk_cor.txt','0bk_err.txt','0bk_nlr.txt', '2bk_cor.txt','2bk_err.txt','2bk_nlr.txt',
+                  'all_bk_cor.txt', 'all_bk_err.txt', 'win_event.txt','loss_event.txt','neutral.txt',
+                  'mental_resp.txt', 'other_resp.txt']
+
+    for ev in evList:
+        onset_data_temp = pandas.read_csv(ev, sep="\t")
+        onset_data_temp.columns = ['onset', 'duration','FSLIntensity']
+        onset_data_temp['trial_type'] = os.path.splitext(os.path.basename(ev))[0]
+        if os.path.basename(ev) in eventFiles:
+            onset_data_temp['event'] = 'event'
+        else:
+            onset_data_temp['event'] = 'block'
+        onset_data_temp['block_membership'] = "na"
+        onset_data.append(onset_data_temp)
+    onset_data = pandas.concat(onset_data)
+    onset_data = onset_data.sort_values(by=['onset'])
+
+    for index, row in onset_data.iterrows():
+        if row['event'] is 'block':
+            onset_data.iloc[index:,5] = row['trial_type']
+    return onset_data
 def hcp2bids(input_dir, output_dir, s_link = False):
     import os 
 
@@ -206,6 +232,21 @@ def hcp2bids(input_dir, output_dir, s_link = False):
                     os.symlink(os.path.realpath(func_data), dst)
             else:
                 shutil.move(func_data, dst)
+            ev_dst = os.path.splitext(dst)[0] +'.ev'
+            evFile = task_onset_grabber(func_data)
+            evFile.to_csv(ev_dst, sep = '\t')
+
+        func_list = glob.glob(os.path.join(subj_raw, 't*/*rfMRI*'))
+        for func_data in func_list:
+            parentdir = os.path.split(os.path.dirname(func_data))[1]
+            dst = func + parentdir +'_'+ os.path.split(func_data)[1]
+
+            if s_link:
+                if not os.path.islink(dst):
+                    os.symlink(os.path.realpath(func_data), dst)
+            else:
+                shutil.move(func_data, dst)
+
         print("done with func for --", subjects)
 
         sbref_list = glob.glob(os.path.join(subj_raw, '*/*SBRef*'))
@@ -252,7 +293,7 @@ def hcp2bids(input_dir, output_dir, s_link = False):
         ''' Sort nifti files and Rename all files as per bids'''
 
         '''Sort func files and rename all per bids'''
-        nifti_func_list = glob.glob(os.path.join(func, '*fMRI*.nii.gz'))
+        nifti_func_list = glob.glob(os.path.join(func, '*fMRI*.nii*'))
         print("\npath where nifti files are searched -", os.path.join(func, '*fMRI*.nii.gz'))
         print(len(nifti_func_list))
         for nifti_func_file in nifti_func_list:
@@ -277,10 +318,12 @@ def hcp2bids(input_dir, output_dir, s_link = False):
 
             if task not in ['REST', 'REST2']:
                 if 'SBRef' in tail:
-                    filename = 'sub-' + sub + '_' + 'task-' + task + '_' +  'acq-' + acq + '_' + tail.lower()
+                    filename = 'sub-' + sub + '_' + 'task-' + task + '_' +  'dir-' + acq + '_' + tail.lower()
                     #filename = 'sub-' + sub + '_' + 'task-' + task + '_' + tail.lower()
+                elif '.ev' in tail:
+                    filename = 'sub-' + sub + '_' + 'task-' + task + '_' + 'dir-' + acq + '_events.tsv'
                 else:
-                    filename = 'sub-' + sub + '_' + 'task-' + task + '_' +  'acq-' + acq + '_bold' + tail[-7:]
+                    filename = 'sub-' + sub + '_' + 'task-' + task + '_' +  'dir-' + acq + '_bold' + tail[-7:]
                     #filename = 'sub-' + sub + '_' + 'task-' + task + '_bold' + tail[-7:]
 
                     # rep_time = { "EMOTION" : 2.26,
@@ -554,32 +597,30 @@ def json_toplevel(output_dir):
         touch(filename)
         filename = os.path.join(output_dir, 'task-%s_acq-LR_sbref.json' %task)
         touch(filename)
-    json_task_files = glob.glob(os.path.join(output_dir, 'task*.json'))
-    #declare dict with common scan_parameters
-    bold_json_dict = {
-    "RepetitionTime": 0.72,
-    "EchoTime": 0.058,
-    "EffectiveEchoSpacing": 0.00058,
-    "MagneticFieldStrength": 3.0,
-    "TaskName": "Gambling",
-    "Manufacturer": "Siemens",
-    "ManufacturerModelName": "Skyra"
-    }
-    for json_file in json_task_files:
-        LR = re.search('acq-LR', json_file)
-        if LR is not None:
-            print("its LR ")
-            addline = {"PhaseEncodingDirection": "i"}
-        RL = re.search('acq-RL', json_file)
-        if RL is not None:
-            print("its RL ")
-            addline = {"PhaseEncodingDirection": "i-"}
-        # addline = { "EffectiveEchoSpacing" : 0.0058}
-        z = bold_json_dict.copy()
-        z.update(addline)
-        print("updated", json_file)
-        with open(json_file, 'w') as editfile:
-            json.dump( z, editfile, indent = 4)
+        json_task_files = glob.glob(os.path.join(output_dir, 'task*.json'))
+        #declare dict with common scan_parameters
+        bold_json_dict = {
+        "RepetitionTime": 0.72,
+        "EchoTime": 0.058,
+        "EffectiveEchoSpacing": 0.00058,
+        "MagneticFieldStrength": 3.0,
+        "TaskName": task,
+        "Manufacturer": "Siemens",
+        "ManufacturerModelName": "Skyra"
+        }
+        for json_file in json_task_files:
+            LR = re.search('dir-LR', json_file)
+            if LR is not None:
+                addline = {"PhaseEncodingDirection": "i"}
+            RL = re.search('dir-RL', json_file)
+            if RL is not None:
+                addline = {"PhaseEncodingDirection": "i-"}
+            addline = { "EffectiveEchoSpacing" : 0.0058}
+            z = bold_json_dict.copy()
+            z.update(addline)
+            print("updated", json_file)
+            with open(json_file, 'w') as editfile:
+                json.dump( z, editfile, indent = 4)
 
 def main():
     import argparse
