@@ -163,7 +163,8 @@ def task_onset_grabber(task_path):
                   'mental_resp.txt', 'other_resp.txt']
 
     for ev in evList:
-        onset_data_temp = pandas.read_csv(ev, delim_whitespace=True)
+        print(ev)
+        onset_data_temp = pandas.read_csv(ev,sep="\t")
         onset_data_temp.columns = ['onset', 'duration','FSLIntensity']
         onset_data_temp['trial_type'] = os.path.splitext(os.path.basename(ev))[0]
         if os.path.basename(ev) in eventFiles:
@@ -234,9 +235,10 @@ def hcp2bids(input_dir, output_dir, s_link = False):
                     os.symlink(os.path.realpath(func_data), dst)
             else:
                 shutil.move(func_data, dst)
-            ev_dst = os.path.splitext(dst)[0] +'.ev'
-            evFile = task_onset_grabber(func_data)
-            evFile.to_csv(ev_dst, sep = '\t')
+            if 'SBRef' not in func_data:
+                ev_dst = os.path.splitext(dst)[0] +'.ev'
+                evFile = task_onset_grabber(func_data)
+                evFile.to_csv(ev_dst, sep = '\t')
 
         func_list = glob.glob(os.path.join(subj_raw, 't*/*rfMRI*'))
         for func_data in func_list:

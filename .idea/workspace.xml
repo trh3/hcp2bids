@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b8965acf-c3b7-4498-a932-7e094122c960" name="Default Changelist" comment="" />
+    <list default="true" id="b8965acf-c3b7-4498-a932-7e094122c960" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hcp2bids/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/hcp2bids/main.py" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,8 +21,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/hcp2bids/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="918">
-              <caret line="168" column="35" lean-forward="true" selection-start-line="154" selection-end-line="179" selection-end-column="21" />
+            <state relative-caret-position="578">
+              <caret line="166" column="52" selection-start-line="166" selection-start-column="52" selection-end-line="166" selection-end-column="52" />
               <folding>
                 <element signature="e#202#225#0" expanded="true" />
               </folding>
@@ -136,8 +139,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/hcp2bids/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="918">
-          <caret line="168" column="35" lean-forward="true" selection-start-line="154" selection-end-line="179" selection-end-column="21" />
+        <state relative-caret-position="578">
+          <caret line="166" column="52" selection-start-line="166" selection-start-column="52" selection-end-line="166" selection-end-column="52" />
           <folding>
             <element signature="e#202#225#0" expanded="true" />
           </folding>
