@@ -162,7 +162,7 @@ def task_onset_grabber(task_path):
                   'mental_resp.txt', 'other_resp.txt']
 
     for ev in evList:
-        onset_data_temp = pandas.read_csv(ev, sep="\t")
+        onset_data_temp = pandas.read_csv(ev, delim_whitespace=True)
         onset_data_temp.columns = ['onset', 'duration','FSLIntensity']
         onset_data_temp['trial_type'] = os.path.splitext(os.path.basename(ev))[0]
         if os.path.basename(ev) in eventFiles:
