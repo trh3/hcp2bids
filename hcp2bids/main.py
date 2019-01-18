@@ -179,9 +179,11 @@ def task_onset_grabber(task_path):
                 print("No Data in EV file.")
     onset_data = pandas.concat(onset_data)
     onset_data = onset_data.sort_values(by=['onset'])
+    onset_data = onset_data.reset_index(drop=True)
     onset_data_copy = onset_data.copy()
     for index, row in onset_data.iterrows():
         if row['event'] is 'block':
+            print(index)
             onset_data_copy.iloc[index:,5] = row['trial_type']
     return onset_data_copy
 
