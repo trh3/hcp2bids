@@ -164,7 +164,6 @@ def task_onset_grabber(task_path):
 
     for ev in evList:
         if 'Sync' not in ev:
-            print(ev)
             try:
                 onset_data_temp = pandas.read_csv(ev,sep="\t",header=None)
                 onset_data_temp.columns = ['onset', 'duration','FSLIntensity']
@@ -176,14 +175,13 @@ def task_onset_grabber(task_path):
                 onset_data_temp['block_membership'] = "na"
                 onset_data.append(onset_data_temp)
             except pandas.errors.EmptyDataError:
-                print("No Data in EV file.")
+                print("No Data in EV file")
     onset_data = pandas.concat(onset_data)
     onset_data = onset_data.sort_values(by=['onset'])
     onset_data = onset_data.reset_index(drop=True)
     onset_data_copy = onset_data.copy()
     for index, row in onset_data.iterrows():
         if row['event'] is 'block':
-            print(index)
             onset_data_copy.iloc[index:,5] = row['trial_type']
     return onset_data_copy
 
@@ -477,8 +475,8 @@ def hcp2bids(input_dir, output_dir, s_link = False):
         ''' Fmaps'''
         counter = 1
         fmap_files_list = glob.glob(os.path.join(fmap, '*SpinEchoFieldMap*.nii.gz'))
-        print("\npath where nifti files are searched -", os.path.join(fmap, '*SpinEchoFieldMap*.nii.gz'))
-        print(len(fmap_files_list))
+        #print("\npath where nifti files are searched -", os.path.join(fmap, '*SpinEchoFieldMap*.nii.gz'))
+        #print(len(fmap_files_list))
         for fmapfile in fmap_files_list:
             fmap_file = os.path.split(fmapfile)[1]
             filename_split = fmap_file.split('_')
@@ -493,7 +491,7 @@ def hcp2bids(input_dir, output_dir, s_link = False):
                 #run = m.group(2)
                 run = '0' + str(task[-1])
                 task = str(task[:-1])
-                print("This is task form rest loop - ", task)
+                #print("This is task form rest loop - ", task)
             tail = filename_split[-1]
             if task not in ['REST', 'REST2']:
                 if 'SBRef' in tail:
@@ -503,7 +501,7 @@ def hcp2bids(input_dir, output_dir, s_link = False):
             else:
                 filename = 'sub-' + sub + '_' + 'task-' + task + '_' +  'acq-' + acq +'_'+ 'run-' + run + '_' + tail.lower()
         
-            print('intended_for - ',filename)
+            #print('intended_for - ',filename)
         
             filename = 'func/'+ filename
             fmap_json_dict = {}
@@ -519,7 +517,7 @@ def hcp2bids(input_dir, output_dir, s_link = False):
             dir = counter
         
             hcpfmapfilename = 'sub-' + sub + '_'+ 'dir-' + str(dir) + '_' + 'epi.nii.gz'
-            print('hcpfmap_filename',hcpfmapfilename)
+            #print('hcpfmap_filename',hcpfmapfilename)
          
             path_filename = fmap + hcpfmapfilename
             
@@ -534,10 +532,10 @@ def hcp2bids(input_dir, output_dir, s_link = False):
         #fmap_magnitude and phasediff
         
         fmap_files_list = glob.glob(os.path.join(fmap, 'T*Magnitude.nii.gz'))
-        print("\npath where nifti files are searched -", os.path.join(fmap, 'T*Magnitude.nii.gz'))
+        #print("\npath where nifti files are searched -", os.path.join(fmap, 'T*Magnitude.nii.gz'))
         run = 1
         for fmapfile in fmap_files_list:
-            print(fmapfile)
+            #print(fmapfile)
             fmap_file = os.path.split(fmapfile)[1]
             filename_split = fmap_file.split('_')
             acq = filename_split[1]
@@ -546,14 +544,14 @@ def hcp2bids(input_dir, output_dir, s_link = False):
             
             filename = 'sub-' + sub + '_' + 'run-0' + str(run) + '_magnitude'+ '.nii.gz'
             path_filename = os.path.join(fmap, filename)
-            print(path_filename)
+            #print(path_filename)
 
             shutil.move(fmapfile, path_filename)
             
             #looking into phasediff image
             filename_phasediff = 'sub-' + sub + '_' + 'run-0' + str(run) + '_phasediff' + '.nii.gz'
             filename_phasediff_path = os.path.join(fmap,filename_phasediff)
-            print(filename_phasediff_path)
+            #print(filename_phasediff_path)
 
             shutil.move(fmapfile.replace('Magnitude', 'Phase'), filename_phasediff_path)
             
@@ -562,7 +560,7 @@ def hcp2bids(input_dir, output_dir, s_link = False):
             touch(filename_phasediff_json_path)
         
             intended_for_filename = 'anat/sub-' + sub + '_' + 'run-0' + run_number + '_' + filename_split[0] + '.nii.gz'
-            print('intended_for - ',intended_for_filename)
+            #print('intended_for - ',intended_for_filename)
             
             fmap_phasdiff_json_dict = {}
             fmap_phasdiff_json_dict["intended_for"] = intended_for_filename
