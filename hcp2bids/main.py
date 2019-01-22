@@ -161,29 +161,31 @@ def task_onset_grabber(task_path):
     eventFiles = ['0bk_cor.txt','0bk_err.txt','0bk_nlr.txt', '2bk_cor.txt','2bk_err.txt','2bk_nlr.txt',
                   'all_bk_cor.txt', 'all_bk_err.txt', 'win_event.txt','loss_event.txt','neutral.txt',
                   'mental_resp.txt', 'other_resp.txt']
-
-    for ev in evList:
-        if 'Sync' not in ev:
-            try:
-                onset_data_temp = pandas.read_csv(ev,sep="\t",header=None)
-                onset_data_temp.columns = ['onset', 'duration','FSLIntensity']
-                onset_data_temp['trial_type'] = os.path.splitext(os.path.basename(ev))[0]
-                if os.path.basename(ev) in eventFiles:
-                    onset_data_temp['event'] = 'event'
-                else:
-                    onset_data_temp['event'] = 'block'
-                onset_data_temp['block_membership'] = "na"
-                onset_data.append(onset_data_temp)
-            except pandas.errors.EmptyDataError:
-                print("No Data in EV file")
-    onset_data = pandas.concat(onset_data)
-    onset_data = onset_data.sort_values(by=['onset'])
-    onset_data = onset_data.reset_index(drop=True)
-    onset_data_copy = onset_data.copy()
-    for index, row in onset_data.iterrows():
-        if row['event'] is 'block':
-            onset_data_copy.iloc[index:,5] = row['trial_type']
-    return onset_data_copy
+    if not evList:
+        for ev in evList:
+            if 'Sync' not in ev:
+                try:
+                    onset_data_temp = pandas.read_csv(ev,sep="\t",header=None)
+                    onset_data_temp.columns = ['onset', 'duration','FSLIntensity']
+                    onset_data_temp['trial_type'] = os.path.splitext(os.path.basename(ev))[0]
+                    if os.path.basename(ev) in eventFiles:
+                        onset_data_temp['event'] = 'event'
+                    else:
+                        onset_data_temp['event'] = 'block'
+                    onset_data_temp['block_membership'] = "na"
+                    onset_data.append(onset_data_temp)
+                except pandas.errors.EmptyDataError:
+                    print("No Data in EV file")
+        onset_data = pandas.concat(onset_data)
+        onset_data = onset_data.sort_values(by=['onset'])
+        onset_data = onset_data.reset_index(drop=True)
+        onset_data_copy = onset_data.copy()
+        for index, row in onset_data.iterrows():
+            if row['event'] is 'block':
+                onset_data_copy.iloc[index:,5] = row['trial_type']
+        return onset_data_copy
+    else:
+        return None
 
 def hcp2bids(input_dir, output_dir, s_link = False):
     import os 
@@ -242,7 +244,8 @@ def hcp2bids(input_dir, output_dir, s_link = False):
             if 'SBRef' not in func_data:
                 ev_dst = os.path.splitext(dst)[0] +'.ev'
                 evFile = task_onset_grabber(func_data)
-                evFile.to_csv(ev_dst, sep = '\t')
+                if evFile is not None:
+                    evFile.to_csv(ev_dst, sep = '\t')
 
         func_list = glob.glob(os.path.join(subj_raw, 't*/*rfMRI*'))
         for func_data in func_list:
