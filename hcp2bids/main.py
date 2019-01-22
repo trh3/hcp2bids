@@ -161,7 +161,7 @@ def task_onset_grabber(task_path):
     eventFiles = ['0bk_cor.txt','0bk_err.txt','0bk_nlr.txt', '2bk_cor.txt','2bk_err.txt','2bk_nlr.txt',
                   'all_bk_cor.txt', 'all_bk_err.txt', 'win_event.txt','loss_event.txt','neutral.txt',
                   'mental_resp.txt', 'other_resp.txt']
-    if not evList:
+    if evList:
         for ev in evList:
             if 'Sync' not in ev:
                 try:
