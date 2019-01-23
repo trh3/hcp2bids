@@ -416,7 +416,7 @@ def hcp2bids(input_dir, output_dir, s_link = False):
             modality = 'dwi'
             tail = filename_split[-1][-7:]
         
-            filename = 'sub-' + sub + '_' + 'acq-' + acq + '_' + modality + tail
+            filename = 'sub-' + sub + '_' + 'dir-' + acq + '_' + modality + tail
             path_filename = dwi + filename
         
             print(path_filename)    
@@ -498,11 +498,11 @@ def hcp2bids(input_dir, output_dir, s_link = False):
             tail = filename_split[-1]
             if task not in ['REST', 'REST2']:
                 if 'SBRef' in tail:
-                    filename = 'sub-' + sub + '_' + 'task-' + task + '_' +  'acq-' + acq + '_' + tail.lower()
+                    filename = 'sub-' + sub + '_' + 'task-' + task + '_' +  'dir-' + acq + '_' + tail.lower()
                 else:
-                    filename = 'sub-' + sub + '_' + 'task-' + task + '_' +  'acq-' + acq + '_bold' + tail[-7:]
+                    filename = 'sub-' + sub + '_' + 'task-' + task + '_' +  'dir-' + acq + '_bold' + tail[-7:]
             else:
-                filename = 'sub-' + sub + '_' + 'task-' + task + '_' +  'acq-' + acq +'_'+ 'run-' + run + '_' + tail.lower()
+                filename = 'sub-' + sub + '_' + 'task-' + task + '_' +  'dir-' + acq +'_'+ 'run-' + run + '_' + tail.lower()
         
             #print('intended_for - ',filename)
         
@@ -600,13 +600,13 @@ def arrange_subjects(output_dir):
 def json_toplevel(output_dir):
     tasks = ['EMOTION', 'GAMBLING', 'LANGUAGE', 'RELATIONAL', 'MOTOR', 'SOCIAL', 'WM', 'REST']
     for task in tasks:
-        filename = os.path.join(output_dir, 'task-%s_acq-RL_bold.json' %task)
+        filename = os.path.join(output_dir, 'task-%s_dir-RL_bold.json' %task)
         touch(filename)
-        filename = os.path.join(output_dir, 'task-%s_acq-LR_bold.json' %task)
+        filename = os.path.join(output_dir, 'task-%s_dir-LR_bold.json' %task)
         touch(filename)
-        filename = os.path.join(output_dir, 'task-%s_acq-RL_sbref.json' %task)
+        filename = os.path.join(output_dir, 'task-%s_dir-RL_sbref.json' %task)
         touch(filename)
-        filename = os.path.join(output_dir, 'task-%s_acq-LR_sbref.json' %task)
+        filename = os.path.join(output_dir, 'task-%s_dir-LR_sbref.json' %task)
         touch(filename)
         json_task_files = glob.glob(os.path.join(output_dir, 'task*.json'))
         #declare dict with common scan_parameters
