@@ -172,7 +172,7 @@ def task_onset_grabber(task_path):
                         onset_data_temp['event'] = 'event'
                     else:
                         onset_data_temp['event'] = 'block'
-                    onset_data_temp['block_membership'] = "na"
+                    onset_data_temp['block_membership'] = "n/a"
                     onset_data.append(onset_data_temp)
                 except pandas.errors.EmptyDataError:
                     print("No Data in EV file")
@@ -245,7 +245,7 @@ def hcp2bids(input_dir, output_dir, s_link = False):
                 ev_dst = os.path.splitext(dst)[0] +'.ev'
                 evFile = task_onset_grabber(func_data)
                 if evFile is not None:
-                    evFile.to_csv(ev_dst, sep = '\t')
+                    evFile.to_csv(ev_dst, sep = '\t', index = False,)
 
         func_list = glob.glob(os.path.join(subj_raw, 't*/*rfMRI*'))
         for func_data in func_list:
@@ -357,8 +357,12 @@ def hcp2bids(input_dir, output_dir, s_link = False):
                     #     json.dump(bold_json_dict, editfile, indent = 4)
 
             else:
-                #filename = 'sub-' + sub + '_' + 'task-' + task + '_' +  'acq-' + acq +'_'+ 'run-' + run + '_' + tail.lower()
-                filename = 'sub-' + sub + '_' + 'task-' + task + '_' +'run-' + run + '_' + tail.lower()
+                if 'SBRef' in tail:
+                    filename = 'sub-' + sub + '_' + 'task-' + task + '_' +  'acq-' + acq + '_' + 'run-' + run + '_' + tail.lower()
+                    #filename = 'sub-' + sub + '_' + 'task-' + task + '_' + tail.lower()
+                else:
+                    filename = 'sub-' + sub + '_' + 'task-' + task + '_' +  'acq-' + acq +'_'+ 'run-' + run + '_bold' + tail[-7:]
+                #filename = 'sub-' + sub + '_' + 'task-' + task + '_' +'run-' + run + '_' + tail.lower()
             
             path_filename = func + filename
             print(path_filename)
@@ -502,7 +506,12 @@ def hcp2bids(input_dir, output_dir, s_link = False):
                 else:
                     filename = 'sub-' + sub + '_' + 'task-' + task + '_' +  'acq-' + acq + '_bold' + tail[-7:]
             else:
-                filename = 'sub-' + sub + '_' + 'task-' + task + '_' +  'acq-' + acq +'_'+ 'run-' + run + '_' + tail.lower()
+                if 'SBRef' in tail:
+                    filename = 'sub-' + sub + '_' + 'task-' + task + '_' +  'acq-' + acq + '_' + 'run-' + run + '_' + tail.lower()
+                    #filename = 'sub-' + sub + '_' + 'task-' + task + '_' + tail.lower()
+                else:
+                    filename = 'sub-' + sub + '_' + 'task-' + task + '_' +  'acq-' + acq +'_'+ 'run-' + run + '_bold' + tail[-7:]
+                #filename = 'sub-' + sub + '_' + 'task-' + task + '_' +'run-' + run + '_' + tail.lower()
         
             #print('intended_for - ',filename)
         
@@ -620,14 +629,16 @@ def json_toplevel(output_dir):
         "ManufacturerModelName": "Skyra"
         }
         for json_file in json_task_files:
+            z = bold_json_dict.copy()
             LR = re.search('acq-LR', json_file)
             if LR is not None:
                 addline = {"PhaseEncodingDirection": "i"}
+                z.update(addline)
             RL = re.search('acq-RL', json_file)
             if RL is not None:
                 addline = {"PhaseEncodingDirection": "i-"}
-            addline = { "EffectiveEchoSpacing" : 0.0058}
-            z = bold_json_dict.copy()
+                z.update(addline)
+            addline = { "EffectiveEchoSpacing" : 0.00058}
             z.update(addline)
             print("updated", json_file)
             with open(json_file, 'w') as editfile:
