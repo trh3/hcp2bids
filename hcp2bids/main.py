@@ -416,7 +416,7 @@ def hcp2bids(input_dir, output_dir, s_link = False):
             modality = 'dwi'
             tail = filename_split[-1][-7:]
         
-            filename = 'sub-' + sub + '_' + 'dir-' + acq + '_' + modality + tail
+            filename = 'sub-' + sub + '_' + 'acq-' + acq + '_' + modality + tail
             path_filename = dwi + filename
         
             print(path_filename)    
@@ -519,7 +519,7 @@ def hcp2bids(input_dir, output_dir, s_link = False):
             #intended_for ={"IntendedFor", filename}
             dir = counter
         
-            hcpfmapfilename = 'sub-' + sub + '_'+ 'dir-' + str(dir) + '_' + 'epi.nii.gz'
+            hcpfmapfilename = 'sub-' + sub + '_'+ 'acq-' + str(dir) + '_' + 'epi.nii.gz'
             #print('hcpfmap_filename',hcpfmapfilename)
          
             path_filename = fmap + hcpfmapfilename
