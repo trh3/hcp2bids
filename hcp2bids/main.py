@@ -620,10 +620,10 @@ def json_toplevel(output_dir):
         "ManufacturerModelName": "Skyra"
         }
         for json_file in json_task_files:
-            LR = re.search('dir-LR', json_file)
+            LR = re.search('acq-LR', json_file)
             if LR is not None:
                 addline = {"PhaseEncodingDirection": "i"}
-            RL = re.search('dir-RL', json_file)
+            RL = re.search('acq-RL', json_file)
             if RL is not None:
                 addline = {"PhaseEncodingDirection": "i-"}
             addline = { "EffectiveEchoSpacing" : 0.0058}
